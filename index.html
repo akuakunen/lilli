@@ -1,1 +1,304 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lillin Karkumatka</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4CAF50">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #2e7d32;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            touch-action: none;
+            user-select: none;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #66bb6a;
+        }
+        #ui {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            display: flex;
+            justify-content: space-between;
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+            pointer-events: none;
+        }
+        #overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 15px 35px;
+            font-size: 22px;
+            font-weight: bold;
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+        button:active { transform: scale(0.96); }
+    </style>
+</head>
+<body>
+    <div id="ui">
+        <div>Pisteet: <span id="score">0</span></div>
+        <div>Ennätys: <span id="highscore">0</span></div>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+    <div id="overlay">
+        <h1 id="title">🐕 Lillin Karkumatka</h1>
+        <p id="subtitle">Pyyhkäise vasemmalle/oikealle väistääksesi ja ylös hypätäksesi!<br><br>Kerää sukkia, nakkeja, viiliä ja roskia.<br>Varo imureita sekä Ellaa, Annia ja Ainoa!</p>
+        <button id="startBtn">JUOKSE LILLI!</button>
+    </div>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreEl = document.getElementById('score');
+        const highscoreEl = document.getElementById('highscore');
+        const overlay = document.getElementById('overlay');
+        const titleEl = document.getElementById('title');
+        const subtitleEl = document.getElementById('subtitle');
+        const startBtn = document.getElementById('startBtn');
+
+        let width, height, laneWidth;
+        function resize() {
+            width = Math.min(window.innerWidth, 500);
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            laneWidth = width / 3;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        let gameRunning = false;
+        let score = 0;
+        let highscore = localStorage.getItem('lilliHighscore') || 0;
+        highscoreEl.textContent = highscore;
+
+        let speed = 6;
+        let frameCount = 0;
+        let entities = [];
+        let floatingTexts = [];
+
+        const lilli = {
+            lane: 1,
+            x: 0,
+            y: 0,
+            isJumping: false,
+            jumpHeight: 0,
+            jumpVelocity: 0
+        };
+
+        const goodies = [
+            { emoji: '🧦', name: 'Sukka!', points: 20 },
+            { emoji: '🌭', name: 'Nakki!', points: 50 },
+            { emoji: '🥛', name: 'Viiliä!', points: 30 },
+            { emoji: '🗑️', name: 'Roska!', points: 15 }
+        ];
+
+        const kids = ['Ella', 'Anni', 'Aino'];
+
+        function resetGame() {
+            score = 0;
+            speed = 6;
+            frameCount = 0;
+            entities = [];
+            floatingTexts = [];
+            lilli.lane = 1;
+            lilli.isJumping = false;
+            lilli.jumpHeight = 0;
+            scoreEl.textContent = '0';
+            gameRunning = true;
+            overlay.style.display = 'none';
+            requestAnimationFrame(gameLoop);
+        }
+
+        startBtn.addEventListener('click', resetGame);
+
+        // Ohjaus (kosketus & näppäimistö)
+        let touchStartX = 0, touchStartY = 0;
+        window.addEventListener('touchstart', e => {
+            touchStartX = e.touches.item(0).clientX;
+            touchStartY = e.touches.item(0).clientY;
+        });
+
+        window.addEventListener('touchend', e => {
+            if (!gameRunning) return;
+            const dx = e.changedTouches.item(0).clientX - touchStartX;
+            const dy = e.changedTouches.item(0).clientY - touchStartY;
+            if (Math.abs(dx) > Math.abs(dy)) {
+                if (dx > 30 && lilli.lane < 2) lilli.lane++;
+                else if (dx < -30 && lilli.lane > 0) lilli.lane--;
+            } else {
+                if (dy < -30 && !lilli.isJumping) jump();
+            }
+        });
+
+        window.addEventListener('keydown', e => {
+            if (!gameRunning) return;
+            if (e.key === 'ArrowLeft' && lilli.lane > 0) lilli.lane--;
+            if (e.key === 'ArrowRight' && lilli.lane < 2) lilli.lane++;
+            if ((e.key === 'ArrowUp' || e.key === ' ') && !lilli.isJumping) jump();
+        });
+
+        function jump() {
+            lilli.isJumping = true;
+            lilli.jumpVelocity = 14;
+        }
+
+        function spawnEntity() {
+            const lane = Math.floor(Math.random() * 3);
+            const rand = Math.random();
+            if (rand < 0.55) {
+                const item = goodies[Math.floor(Math.random() * goodies.length)];
+                entities.push({ type: 'goodie', lane, y: -50, ...item });
+            } else if (rand < 0.8) {
+                const obs = Math.random() < 0.5 ? { emoji: '🧹', label: 'Imuri' } : { emoji: '💦', label: 'Kuraa' };
+                entities.push({ type: 'obstacle', lane, y: -50, ...obs });
+            } else {
+                const kid = kids[Math.floor(Math.random() * kids.length)];
+                entities.push({ type: 'kid', lane, y: -50, emoji: '👧', label: kid + '!' });
+            }
+        }
+
+        function gameLoop() {
+            if (!gameRunning) return;
+            frameCount++;
+            speed += 0.002;
+
+            // Tausta ja kaistaviivat
+            ctx.fillStyle = '#558b2f';
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            ctx.lineWidth = 4;
+            ctx.setLineDash(new Array(30, 30));
+            ctx.lineDashOffset = -(frameCount * speed) % 60;
+            for (let i = 1; i < 3; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * laneWidth, 0);
+                ctx.lineTo(i * laneWidth, height);
+                ctx.stroke();
+            }
+            ctx.setLineDash([]);
+
+            // Uusien kohteiden luonti
+            if (frameCount % Math.max(25, Math.floor(65 - speed * 2)) === 0) {
+                spawnEntity();
+            }
+
+            // Lillin fysiikka ja piirto
+            const targetX = lilli.lane * laneWidth + laneWidth / 2;
+            lilli.x += (targetX - lilli.x) * 0.25;
+            lilli.y = height - 110;
+
+            if (lilli.isJumping) {
+                lilli.jumpHeight += lilli.jumpVelocity;
+                lilli.jumpVelocity -= 0.8;
+                if (lilli.jumpHeight <= 0) {
+                    lilli.jumpHeight = 0;
+                    lilli.isJumping = false;
+                }
+            }
+
+            // Kohteiden päivitys ja törmäykset
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            for (let i = entities.length - 1; i >= 0; i--) {
+                const ent = entities[i];
+                ent.y += speed;
+                const entX = ent.lane * laneWidth + laneWidth / 2;
+
+                ctx.font = '48px Arial';
+                ctx.fillText(ent.emoji, entX, ent.y);
+                if (ent.type === 'kid') {
+                    ctx.font = 'bold 18px Arial';
+                    ctx.fillStyle = '#ffeb3b';
+                    ctx.fillText(ent.label, entX, ent.y - 38);
+                }
+
+                const distY = Math.abs(ent.y - lilli.y);
+                if (ent.lane === lilli.lane && distY < 45) {
+                    if (ent.type === 'goodie' && lilli.jumpHeight < 40) {
+                        score += ent.points;
+                        scoreEl.textContent = score;
+                        floatingTexts.push({ text: `${ent.name} +${ent.points}`, x: lilli.x, y: lilli.y - 50, alpha: 1 });
+                        entities.splice(i, 1);
+                        continue;
+                    } else if ((ent.type === 'obstacle' || ent.type === 'kid') && lilli.jumpHeight < 35) {
+                        gameOver(ent);
+                        return;
+                    }
+                }
+
+                if (ent.y > height + 60) {
+                    entities.splice(i, 1);
+                }
+            }
+
+            // Piirrä Lilli (varjo + koira)
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.beginPath();
+            ctx.ellipse(lilli.x, lilli.y + 25, 25 - lilli.jumpHeight * 0.1, 10, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            const scale = 1 + lilli.jumpHeight * 0.005;
+            ctx.font = `${Math.floor(58 * scale)}px Arial`;
+            ctx.fillText('🐕', lilli.x, lilli.y - lilli.jumpHeight);
+
+            // Kelluvat pistetekstit
+            for (let i = floatingTexts.length - 1; i >= 0; i--) {
+              const ft = floatingTexts[i];
+ft.y -= 2;
+ft.alpha -= 0.02;
+ctx.font = 'bold 20px Arial';
+ctx.fillStyle = rgba(255, 255, 255, ${ft.alpha});
+ctx.fillText(ft.text, ft.x, ft.y);
+if (ft.alpha <= 0) floatingTexts.splice(i, 1);
+}
+requestAnimationFrame(gameLoop);
+}
+function gameOver(ent) {
+gameRunning = false;
+if (score > highscore) {
+highscore = score;
+localStorage.setItem('lilliHighscore', highscore);
+highscoreEl.textContent = highscore;
+}
+titleEl.textContent = ent.type === 'kid' ? ${ent.label.replace('!', '')} sai Lillin kiinni! 🤗 : 'Hups, Lilli jäi kiinni!';
+subtitleEl.innerHTML = Sait kerättyä <b>${score}</b> pistettä!<br>Ennätys: ${highscore};
+startBtn.textContent = 'UUSI KARKUMATKA';
+overlay.style.display = 'flex';
+}
+
+
 
