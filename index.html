@@ -1,304 +1,449 @@
 <!DOCTYPE html>
 <html lang="fi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Lillin Karkumatka</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#4CAF50">
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
-    body { background-color: #2e7d32; font-family: Arial, sans-serif; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; touch-action: none; }
-    #gameContainer { position: relative; width: 100%; max-width: 480px; height: 100vh; background: #558b2f; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-    canvas { display: block; width: 100%; height: 100%; }
-    #hud { position: absolute; top: 15px; left: 15px; right: 15px; display: flex; justify-content: space-between; color: #fff; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.6); pointer-events: none; z-index: 5; }
-    #dodgeList { position: absolute; top: 52px; left: 15px; background: rgba(0, 0, 0, 0.35); border-left: 3px solid #ff5252; border-radius: 6px; padding: 8px 10px; color: #fff; font-size: 13px; line-height: 1.5; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); pointer-events: none; z-index: 5; }
-    #dodgeList .list-title { font-weight: bold; color: #ff8a80; margin-bottom: 3px; font-size: 12px; text-transform: uppercase; }
-    #overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white; padding: 20px; z-index: 10; }
-    #title { font-size: 32px; margin-bottom: 12px; color: #ffeb3b; }
-    #subtitle { font-size: 18px; margin-bottom: 24px; line-height: 1.5; }
-    #startBtn { background: #4CAF50; color: white; border: none; padding: 15px 32px; font-size: 20px; font-weight: bold; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
-    #startBtn:active { transform: scale(0.96); }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Lillin Karkumatka</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4CAF50">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+  body { background-color: #2e7d32; font-family: Arial, sans-serif; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; touch-action: none; }
+  #gameContainer { position: relative; width: 100%; max-width: 480px; height: 100vh; background: #558b2f; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+  canvas { display: block; width: 100%; height: 100%; }
+  #hud { position: absolute; top: 15px; left: 15px; right: 15px; display: flex; justify-content: space-between; color: #fff; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.6); pointer-events: none; z-index: 5; }
+  #dodgeList { position: absolute; top: 52px; left: 15px; background: rgba(0, 0, 0, 0.35); border-left: 3px solid #ff5252; border-radius: 6px; padding: 8px 10px; color: #fff; font-size: 13px; line-height: 1.5; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); pointer-events: none; z-index: 5; }
+  #dodgeList .list-title { font-weight: bold; color: #ff8a80; margin-bottom: 3px; font-size: 12px; text-transform: uppercase; }
+  #overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white; padding: 20px; z-index: 10; }
+  #title { font-size: 32px; margin-bottom: 12px; color: #ffeb3b; }
+  #subtitle { font-size: 18px; margin-bottom: 24px; line-height: 1.5; }
+  #startBtn { background: #4CAF50; color: white; border: none; padding: 15px 32px; font-size: 20px; font-weight: bold; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
+  #startBtn:active { transform: scale(0.96); }
+</style>
 </head>
 <body>
-  <div id="gameContainer">
-    <div id="hud">
-      <div>Pisteet: <span id="score">0</span></div>
-      <div>Ennätys: <span id="highscore">0</span></div>
-    </div>
-    <div id="dodgeList">
-      <div class="list-title">Väistä näitä:</div>
-      <div>🪴 Kukkaruukku</div>
-      <div>🧹 Luuta</div>
-      <div>🧸 Lelu</div>
-      <div>🧒 Lapsi</div>
-      <div>👩 Äiti (500+ p)</div>
-    </div>
-    <canvas id="gameCanvas"></canvas>
-    <div id="overlay">
-      <h1 id="title">Lillin Karkumatka</h1>
-      <p id="subtitle">Pyyhkäise vasemmalle/oikealle vaihtaaksesi kaistaa ja ylös hypätäksesi!<br>Varo Äitiä 500 pisteen jälkeen!</p>
-      <button id="startBtn">ALOITA KARKUMATKA</button>
-    </div>
+<div id="gameContainer">
+  <div id="hud">
+    <div>Pisteet: <span id="score">0</span></div>
+    <div>Ennätys: <span id="highscore">0</span></div>
   </div>
-    <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(() => {});
-    }
+  <div id="dodgeList">
+    <div class="list-title">Väistä näitä:</div>
+    <div>🪴 Kukkaruukku</div>
+    <div>🧹 Luuta</div>
+    <div>🧸 Lelu</div>
+    <div>🧒 Lapsi</div>
+    <div>👩 Äiti (500+ p)</div>
+  </div>
+  <canvas id="gameCanvas"></canvas>
+  <div id="overlay">
+    <h1 id="title">Lillin Karkumatka</h1>
+    <p id="subtitle">Pyyhkäise vasemmalle/oikealle vaihtaaksesi kaistaa ja ylös hypätäksesi! <br>Varo Äitiä 500 pisteen jälkeen!</p>
+    <button id="startBtn">ALOITA KARKUMATKA</button>
+  </div>
+</div>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
 
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const scoreEl = document.getElementById('score');
-    const highscoreEl = document.getElementById('highscore');
-    const overlay = document.getElementById('overlay');
-    const titleEl = document.getElementById('title');
-    const subtitleEl = document.getElementById('subtitle');
-    const startBtn = document.getElementById('startBtn');
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const scoreEl = document.getElementById('score');
+const highscoreEl = document.getElementById('highscore');
+const overlay = document.getElementById('overlay');
+const titleEl = document.getElementById('title');
+const subtitleEl = document.getElementById('subtitle');
+const startBtn = document.getElementById('startBtn');
 
-    const LANE_COUNT = 5;
-    let width, height, laneWidth;
+const LANE_COUNT = 5;
+let width, height, laneWidth;
 
-    function resize() {
-      width = canvas.width = canvas.parentElement.clientWidth;
-      height = canvas.height = canvas.parentElement.clientHeight;
-      laneWidth = width / LANE_COUNT;
-    }
-    window.addEventListener('resize', resize);
-    resize();
+function resize() {
+  width = canvas.width = canvas.parentElement.clientWidth;
+  height = canvas.height = canvas.parentElement.clientHeight;
+  laneWidth = width / LANE_COUNT;
+}
+window.addEventListener('resize', resize);
+resize();
 
-    let highscore = parseInt(localStorage.getItem('lilliHighscore')) || 0;
-    highscoreEl.textContent = highscore;
+let highscore = parseInt(localStorage.getItem('lilliHighscore')) || 0;
+highscoreEl.textContent = highscore;
 
-    let gameRunning = false, score = 0, speed = 5, frameCount = 0, momCooldown = 0;
-    let lilli = { lane: 2, x: 0, y: 0, isJumping: false, jumpHeight: 0, jumpVelocity: 0 };
-    let entities = [], fartClouds = [], floatingTexts = [];
+let gameRunning = false, score = 0, speed = 5, animTime = 0, momCooldown = 0;
+let spawnTimer = 0, fartTimer = 0, dashOffset = 0, lastTime = 0;
 
-    const goodies = [
-      { emoji: '🦴', name: 'Luu', points: 15 },
-      { emoji: '🥩', name: 'Pihvi', points: 30 },
-      { emoji: '🧀', name: 'Juusto', points: 25 },
-      { emoji: '🌭', name: 'Nakki', points: 25 },
-      { emoji: '🥓', name: 'Pekoni', points: 35 },
-      { emoji: '🍗', name: 'Kana', points: 20 }
-    ];
+let lilli = { lane: 2, x: 0, y: 0, isJumping: false, jumpHeight: 0, jumpVelocity: 0, eatPop: 0 };
+let entities = [], fartClouds = [], floatingTexts = [], popParticles = [];
 
-    const obstacles = [
-      { type: 'obstacle', emoji: '🪴', name: 'Kukkaruukku' },
-      { type: 'obstacle', emoji: '🧹', name: 'Luuta' },
-      { type: 'obstacle', emoji: '🧸', name: 'Lelu' },
-      { type: 'kid', emoji: '🧒', label: 'Lapsi!' }
-    ];
-    function resetGame() {
-      score = 0; speed = 5; frameCount = 0; momCooldown = 0;
-      scoreEl.textContent = score;
-      lilli.lane = 2;
-      lilli.x = lilli.lane * laneWidth + laneWidth / 2;
-      lilli.y = height - 110;
-      lilli.isJumping = false; lilli.jumpHeight = 0; lilli.jumpVelocity = 0;
-      entities = []; fartClouds = []; floatingTexts = [];
-      overlay.style.display = 'none';
-      gameRunning = true;
-      requestAnimationFrame(gameLoop);
-    }
-    startBtn.addEventListener('click', resetGame);
+const goodies = [
+  { emoji: '🦴', name: 'Luu', points: 15 },
+  { emoji: '🥩', name: 'Pihvi', points: 30 },
+  { emoji: '🧀', name: 'Juusto', points: 25 },
+  { emoji: '🌭', name: 'Nakki', points: 25 },
+  { emoji: '🥓', name: 'Pekoni', points: 35 },
+  { emoji: '🍗', name: 'Kana', points: 20 }
+];
 
-    function moveLeft() { if (gameRunning && lilli.lane > 0) lilli.lane--; }
-    function moveRight() { if (gameRunning && lilli.lane < LANE_COUNT - 1) lilli.lane++; }
-    function jump() { if (gameRunning && !lilli.isJumping) { lilli.isJumping = true; lilli.jumpVelocity = 15; } }
+const obstacles = [
+  { type: 'obstacle', emoji: '🪴', name: 'Kukkaruukku' },
+  { type: 'obstacle', emoji: '🧹', name: 'Luuta' },
+  { type: 'obstacle', emoji: '🧸', name: 'Lelu' },
+  { type: 'kid', emoji: '🧒', label: 'Lapsi!' }
+];
 
-    let touchStartX = 0, touchStartY = 0;
-    window.addEventListener('touchstart', e => {
-      touchStartX = e.touches.item(0).clientX;
-      touchStartY = e.touches.item(0).clientY;
-    }, { passive: true });
+function resetGame() {
+  score = 0; speed = 5; animTime = 0; momCooldown = 0;
+  spawnTimer = 0; fartTimer = 0; dashOffset = 0;
+  scoreEl.textContent = score;
+  lilli.lane = 2;
+  lilli.x = lilli.lane * laneWidth + laneWidth / 2;
+  lilli.y = height - 110;
+  lilli.isJumping = false; lilli.jumpHeight = 0; lilli.jumpVelocity = 0; lilli.eatPop = 0;
+  entities = []; fartClouds = []; floatingTexts = []; popParticles = [];
+  overlay.style.display = 'none';
+  gameRunning = true;
+  lastTime = performance.now();
+  requestAnimationFrame(gameLoop);
+}
 
-    window.addEventListener('touchend', e => {
-      if (!gameRunning) return;
-      const dx = e.changedTouches.item(0).clientX - touchStartX;
-      const dy = e.changedTouches.item(0).clientY - touchStartY;
-      if (Math.abs(dx) > Math.abs(dy)) {
-        if (dx > 25) moveRight(); else if (dx < -25) moveLeft();
-      } else if (dy < -25) {
-        jump();
-      }
-    }, { passive: true });
+startBtn.addEventListener('click', resetGame);
+function moveLeft() { if (gameRunning && lilli.lane > 0) lilli.lane--; }
+function moveRight() { if (gameRunning && lilli.lane < LANE_COUNT - 1) lilli.lane++; }
+function jump() { if (gameRunning && !lilli.isJumping) { lilli.isJumping = true; lilli.jumpVelocity = 15; } }
 
-    window.addEventListener('keydown', e => {
-      if (e.key === 'ArrowLeft' || e.key === 'a') moveLeft();
-      if (e.key === 'ArrowRight' || e.key === 'd') moveRight();
-      if (e.key === 'ArrowUp' || e.key === 'w' || e.key === ' ') jump();
+let touchStartX = 0, touchStartY = 0;
+window.addEventListener('touchstart', e => {
+  touchStartX = e.touches.item(0).clientX;
+  touchStartY = e.touches.item(0).clientY;
+}, { passive: true });
+
+window.addEventListener('touchend', e => {
+  if (!gameRunning) return;
+  const dx = e.changedTouches.item(0).clientX - touchStartX;
+  const dy = e.changedTouches.item(0).clientY - touchStartY;
+  if (Math.abs(dx) > Math.abs(dy)) {
+    if (dx > 25) moveRight(); else if (dx < -25) moveLeft();
+  } else if (dy < -25) {
+    jump();
+  }
+}, { passive: true });
+
+window.addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft' || e.key === 'a') moveLeft();
+  if (e.key === 'ArrowRight' || e.key === 'd') moveRight();
+  if (e.key === 'ArrowUp' || e.key === 'w' || e.key === ' ') jump();
+});
+
+function triggerFart() {
+  for (let i = 0; i < 6; i++) {
+    fartClouds.push({
+      x: lilli.x + (Math.random() - 0.5) * 20,
+      y: lilli.y + 15,
+      vx: (Math.random() - 0.5) * 2,
+      vy: 1 + Math.random() * 2,
+      size: 8 + Math.random() * 8,
+      alpha: 0.9
     });
+  }
+}
 
-    function triggerFart() {
-      for (let i = 0; i < 6; i++) {
-        fartClouds.push({
-          x: lilli.x + (Math.random() - 0.5) * 20,
-          y: lilli.y + 15,
-          vx: (Math.random() - 0.5) * 2,
-          vy: 1 + Math.random() * 2,
-          size: 8 + Math.random() * 8,
-          alpha: 0.9
+function triggerPop(x, y, points, name) {
+  lilli.eatPop = 1.0;
+
+  const colors = ['#ffeb3b', '#ff9800', '#ffffff', '#76ff03', '#ff4081'];
+  for (let i = 0; i < 14; i++) {
+    const angle = (Math.PI * 2 * i) / 14 + (Math.random() - 0.5) * 0.3;
+    const vel = 2.5 + Math.random() * 4.5;
+    popParticles.push({
+      x: x,
+      y: y,
+      vx: Math.cos(angle) * vel,
+      vy: Math.sin(angle) * vel - 1.5,
+      size: 4 + Math.random() * 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      alpha: 1,
+      isStar: i % 2 === 0
+    });
+  }
+
+  floatingTexts.push({
+    text: `+${points} ${name}!`,
+    x: x,
+    y: y - 20,
+    vx: (Math.random() - 0.5) * 2.5,
+    vy: -4.5,
+    scale: 1.4,
+    alpha: 1,
+    color: points >= 30 ? '#ffeb3b' : '#ffffff'
+  });
+}
+function spawnEntity() {
+  if (momCooldown > 0) momCooldown--;
+
+  if (score >= 500 && momCooldown === 0 && Math.random() < 0.25) {
+    const startLane = Math.floor(Math.random() * (LANE_COUNT - 2));
+    for (let l = startLane; l < startLane + 3; l++) {
+      entities.push({ type: 'mom', lane: l, y: -50, emoji: '👩', label: 'Äiti!' });
+    }
+    momCooldown = 4;
+    return 1.0;
+  }
+
+  const lane = Math.floor(Math.random() * LANE_COUNT);
+
+  if (Math.random() < 0.72) {
+    if (Math.random() < 0.20) {
+      const streakLength = 5 + Math.floor(Math.random() * 4);
+      const g = goodies[Math.floor(Math.random() * goodies.length)];
+      const spacing = 55;
+      for (let k = 0; k < streakLength; k++) {
+        entities.push({
+          type: 'goodie',
+          lane: lane,
+          y: -40 - (k * spacing),
+          emoji: g.emoji,
+          name: g.name,
+          points: g.points
         });
       }
+      return 1.0 + (streakLength * 0.25);
     }
-    function spawnEntity() {
-      if (momCooldown > 0) momCooldown--;
-      if (score >= 500 && momCooldown === 0 && Math.random() < 0.25) {
-        const startLane = Math.floor(Math.random() * (LANE_COUNT - 2));
-        for (let l = startLane; l < startLane + 3; l++) {
-          entities.push({ type: 'mom', lane: l, y: -50, emoji: '👩', label: 'Äiti!' });
+
+    const g = goodies[Math.floor(Math.random() * goodies.length)];
+    entities.push({ type: 'goodie', lane: lane, y: -40, emoji: g.emoji, name: g.name, points: g.points });
+
+    if (Math.random() < 0.35) {
+      const secondLane = (lane + 1 + Math.floor(Math.random() * (LANE_COUNT - 1))) % LANE_COUNT;
+      const g2 = goodies[Math.floor(Math.random() * goodies.length)];
+      entities.push({ type: 'goodie', lane: secondLane, y: -40, emoji: g2.emoji, name: g2.name, points: g2.points });
+    }
+  } else {
+    const obs = obstacles[Math.floor(Math.random() * obstacles.length)];
+    entities.push({ type: obs.type, lane: lane, y: -40, emoji: obs.emoji, label: obs.label || '' });
+  }
+  return 1.0;
+}
+
+function drawBlackCurlyLilli(x, y, jumpH, time, eatPop) {
+  const popScale = Math.sin(eatPop * Math.PI) * 0.22;
+  const scale = 1 + jumpH * 0.005 + popScale;
+  const drawY = y - jumpH;
+  const bounce = Math.sin(time * 0.3) * 3;
+
+  ctx.save();
+  ctx.translate(x, drawY + bounce);
+  ctx.scale(scale, scale);
+
+  ctx.fillStyle = '#1a1a1a';
+  const curls = [
+    { cx: 0, cy: 5, r: 20 }, { cx: -15, cy: 2, r: 13 }, { cx: 15, cy: 2, r: 13 },
+    { cx: -12, cy: -10, r: 14 }, { cx: 12, cy: -10, r: 14 }, { cx: 0, cy: -18, r: 16 },
+    { cx: -9, cy: -24, r: 10 }, { cx: 9, cy: -24, r: 10 }, { cx: 0, cy: -28, r: 10 }
+  ];
+  curls.forEach(c => { ctx.beginPath(); ctx.arc(c.cx, c.cy, c.r, 0, Math.PI * 2); ctx.fill(); });
+
+  ctx.fillStyle = '#0d0d0d';
+  ctx.beginPath(); ctx.ellipse(-20, -14, 7, 13, 0.3, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(20, -14, 7, 13, -0.3, 0, Math.PI * 2); ctx.fill();
+
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(-6, -18, 3, 0, Math.PI * 2); ctx.arc(6, -18, 3, 0, Math.PI * 2); ctx.fill();
+
+  ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.arc(-6, -18, 1.5, 0, Math.PI * 2); ctx.arc(6, -18, 1.5, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(0, -12, 4.5, 3, 0, 0, Math.PI * 2); ctx.fill();
+
+  ctx.restore();
+}
+function gameLoop(timestamp) {
+  if (!gameRunning) return;
+
+  const elapsed = timestamp - lastTime;
+  lastTime = timestamp;
+  const dt = Math.min(elapsed / (1000 / 60), 3);
+
+  animTime += dt;
+  speed += 0.002 * dt;
+
+  if (lilli.eatPop > 0) {
+    lilli.eatPop = Math.max(0, lilli.eatPop - 0.08 * dt);
+  }
+
+  fartTimer += dt;
+  if (fartTimer >= 220) {
+    fartTimer = 0;
+    if (Math.random() < 0.75) triggerFart();
+  }
+
+  ctx.fillStyle = '#558b2f';
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+  ctx.lineWidth = 3;
+  ctx.setLineDash([30, 30]);
+  dashOffset = (dashOffset + speed * dt) % 60;
+  ctx.lineDashOffset = -dashOffset;
+  for (let i = 1; i < LANE_COUNT; i++) {
+    ctx.beginPath();
+    ctx.moveTo(i * laneWidth, 0);
+    ctx.lineTo(i * laneWidth, height);
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+
+  spawnTimer -= dt;
+  if (spawnTimer <= 0) {
+    const delayMultiplier = spawnEntity();
+    const baseInterval = Math.max(22, 60 - speed * 2);
+    spawnTimer = baseInterval * delayMultiplier;
+  }
+
+  const targetX = lilli.lane * laneWidth + laneWidth / 2;
+  lilli.x += (targetX - lilli.x) * (1 - Math.pow(0.75, dt));
+  lilli.y = height - 110;
+
+  if (lilli.isJumping) {
+    lilli.jumpHeight += lilli.jumpVelocity * dt;
+    lilli.jumpVelocity -= 0.8 * dt;
+    if (lilli.jumpHeight <= 0) {
+      lilli.jumpHeight = 0;
+      lilli.isJumping = false;
+    }
+  }
+
+  for (let i = fartClouds.length - 1; i >= 0; i--) {
+    const fc = fartClouds[i];
+    fc.x += fc.vx * dt;
+    fc.y += fc.vy * dt;
+    fc.size += 0.4 * dt;
+    fc.alpha -= 0.02 * dt;
+    if (fc.alpha <= 0) {
+      fartClouds.splice(i, 1);
+      continue;
+    }
+    ctx.fillStyle = `rgba(173, 255, 47, ${fc.alpha})`;
+    ctx.beginPath();
+    ctx.arc(fc.x, fc.y, fc.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  for (let i = entities.length - 1; i >= 0; i--) {
+    const ent = entities[i];
+    ent.y += speed * dt;
+    const entX = ent.lane * laneWidth + laneWidth / 2;
+
+    if (ent.type === 'goodie') {
+      const pulse = 1 + Math.sin(animTime * 0.15 + ent.y * 0.05) * 0.08;
+      ctx.save();
+      ctx.translate(entX, ent.y);
+      ctx.scale(pulse, pulse);
+      ctx.font = '38px Arial';
+      ctx.fillText(ent.emoji, 0, 0);
+      ctx.restore();
+    } else {
+      ctx.font = '38px Arial';
+      ctx.fillText(ent.emoji, entX, ent.y);
+    }
+
+    if (ent.type === 'kid' || ent.type === 'mom') {
+      ctx.font = 'bold 16px Arial';
+      ctx.fillStyle = ent.type === 'mom' ? '#ff5252' : '#ffeb3b';
+      ctx.fillText(ent.label, entX, ent.y - 32);
+    }
+
+    if (ent.lane === lilli.lane && Math.abs(ent.y - lilli.y) < 42) {
+      if (ent.type === 'goodie' && lilli.jumpHeight < 40) {
+        score += ent.points;
+        scoreEl.textContent = score;
+        triggerPop(lilli.x, lilli.y - 25, ent.points, ent.name);
+        if ((ent.emoji === '🧀' || ent.emoji === '🌭') && Math.random() < 0.5) {
+          setTimeout(triggerFart, 250);
         }
-        momCooldown = 4;
+        entities.splice(i, 1);
+        continue;
+      } else if ((ent.type === 'obstacle' || ent.type === 'kid' || ent.type === 'mom') && lilli.jumpHeight < 35) {
+        gameOver(ent);
         return;
       }
-
-      const lane = Math.floor(Math.random() * LANE_COUNT);
-      if (Math.random() < 0.70) {
-        const g = goodies[Math.floor(Math.random() * goodies.length)];
-        entities.push({ type: 'goodie', lane: lane, y: -40, emoji: g.emoji, name: g.name, points: g.points });
-        if (Math.random() < 0.35) {
-          const secondLane = (lane + 1 + Math.floor(Math.random() * (LANE_COUNT - 1))) % LANE_COUNT;
-          const g2 = goodies[Math.floor(Math.random() * goodies.length)];
-          entities.push({ type: 'goodie', lane: secondLane, y: -40, emoji: g2.emoji, name: g2.name, points: g2.points });
-        }
-      } else {
-        const obs = obstacles[Math.floor(Math.random() * obstacles.length)];
-        entities.push({ type: obs.type, lane: lane, y: -40, emoji: obs.emoji, label: obs.label || '' });
-      }
     }
 
-    function drawBlackCurlyLilli(x, y, jumpH, frame) {
-      const scale = 1 + jumpH * 0.005;
-      const drawY = y - jumpH;
-      const bounce = Math.sin(frame * 0.3) * 3;
-      ctx.save();
-      ctx.translate(x, drawY + bounce);
-      ctx.scale(scale, scale);
-      ctx.fillStyle = '#1a1a1a';
-      const curls = [
-        { cx: 0, cy: 5, r: 20 }, { cx: -15, cy: 2, r: 13 }, { cx: 15, cy: 2, r: 13 },
-        { cx: -12, cy: -10, r: 14 }, { cx: 12, cy: -10, r: 14 }, { cx: 0, cy: -18, r: 16 },
-        { cx: -9, cy: -24, r: 10 }, { cx: 9, cy: -24, r: 10 }, { cx: 0, cy: -28, r: 10 }
-      ];
-      curls.forEach(c => { ctx.beginPath(); ctx.arc(c.cx, c.cy, c.r, 0, Math.PI * 2); ctx.fill(); });
-      ctx.fillStyle = '#0d0d0d';
-      ctx.beginPath(); ctx.ellipse(-20, -14, 7, 13, 0.3, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(20, -14, 7, 13, -0.3, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#fff';
-      ctx.beginPath(); ctx.arc(-6, -18, 3, 0, Math.PI * 2); ctx.arc(6, -18, 3, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#000';
-      ctx.beginPath(); ctx.arc(-6, -18, 1.5, 0, Math.PI * 2); ctx.arc(6, -18, 1.5, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(0, -12, 4.5, 3, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
+    if (ent.y > height + 60) entities.splice(i, 1);
+  }
+
+  ctx.fillStyle = 'rgba(0,0,0,0.3)';
+  ctx.beginPath();
+  ctx.ellipse(lilli.x, lilli.y + 25, Math.max(8, 22 - lilli.jumpHeight * 0.1), 9, 0, 0, Math.PI * 2);
+  ctx.fill();
+  drawBlackCurlyLilli(lilli.x, lilli.y, lilli.jumpHeight, animTime, lilli.eatPop);
+
+  for (let i = popParticles.length - 1; i >= 0; i--) {
+    const p = popParticles[i];
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.vy += 0.15 * dt;
+    p.alpha -= 0.03 * dt;
+    if (p.alpha <= 0) {
+      popParticles.splice(i, 1);
+      continue;
     }
-          function gameLoop() {
-      if (!gameRunning) return;
-      frameCount++;
-      speed += 0.002;
-      if (frameCount % 220 === 0 && Math.random() < 0.75) triggerFart();
-
-      ctx.fillStyle = '#558b2f';
-      ctx.fillRect(0, 0, width, height);
-
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
-      ctx.lineWidth = 3;
-      ctx.setLineDash(new Array(30, 30));
-      ctx.lineDashOffset = -(frameCount * speed) % 60;
-      for (let i = 1; i < LANE_COUNT; i++) {
-        ctx.beginPath();
-        ctx.moveTo(i * laneWidth, 0);
-        ctx.lineTo(i * laneWidth, height);
-        ctx.stroke();
-      }
-      ctx.setLineDash([]);
-
-      if (frameCount % Math.max(22, Math.floor(60 - speed * 2)) === 0) spawnEntity();
-
-      const targetX = lilli.lane * laneWidth + laneWidth / 2;
-      lilli.x += (targetX - lilli.x) * 0.25;
-      lilli.y = height - 110;
-
-      if (lilli.isJumping) {
-        lilli.jumpHeight += lilli.jumpVelocity;
-        lilli.jumpVelocity -= 0.8;
-        if (lilli.jumpHeight <= 0) { lilli.jumpHeight = 0; lilli.isJumping = false; }
-      }
-
-      for (let i = fartClouds.length - 1; i >= 0; i--) {
-        const fc = fartClouds[i];
-        fc.x += fc.vx; fc.y += fc.vy; fc.size += 0.4; fc.alpha -= 0.02;
-        ctx.fillStyle = 'rgba(173, 255, 47, ' + fc.alpha + ')';
-        ctx.beginPath(); ctx.arc(fc.x, fc.y, fc.size, 0, Math.PI * 2); ctx.fill();
-        if (fc.alpha <= 0) fartClouds.splice(i, 1);
-      }
-
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      for (let i = entities.length - 1; i >= 0; i--) {
-        const ent = entities[i];
-        ent.y += speed;
-        const entX = ent.lane * laneWidth + laneWidth / 2;
-        ctx.font = '38px Arial';
-        ctx.fillText(ent.emoji, entX, ent.y);
-
-        if (ent.type === 'kid' || ent.type === 'mom') {
-          ctx.font = 'bold 16px Arial';
-          ctx.fillStyle = ent.type === 'mom' ? '#ff5252' : '#ffeb3b';
-          ctx.fillText(ent.label, entX, ent.y - 32);
-        }
-
-        if (ent.lane === lilli.lane && Math.abs(ent.y - lilli.y) < 42) {
-          if (ent.type === 'goodie' && lilli.jumpHeight < 40) {
-            score += ent.points;
-            scoreEl.textContent = score;
-            floatingTexts.push({ text: ent.name + ' +' + ent.points, x: lilli.x, y: lilli.y - 50, alpha: 1 });
-            if ((ent.emoji === '🧀' || ent.emoji === '🌭') && Math.random() < 0.5) setTimeout(triggerFart, 250);
-            entities.splice(i, 1);
-            continue;
-          } else if ((ent.type === 'obstacle' || ent.type === 'kid' || ent.type === 'mom') && lilli.jumpHeight < 35) {
-            gameOver(ent);
-            return;
-          }
-        }
-        if (ent.y > height + 60) entities.splice(i, 1);
-      }
-
-      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.save();
+    ctx.globalAlpha = p.alpha;
+    ctx.fillStyle = p.color;
+    ctx.translate(p.x, p.y);
+    if (p.isStar) {
+      ctx.rotate(animTime * 0.2);
+      ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+    } else {
       ctx.beginPath();
-      ctx.ellipse(lilli.x, lilli.y + 25, Math.max(8, 22 - lilli.jumpHeight * 0.1), 9, 0, 0, Math.PI * 2);
+      ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
       ctx.fill();
-
-      drawBlackCurlyLilli(lilli.x, lilli.y, lilli.jumpHeight, frameCount);
-
-      for (let i = floatingTexts.length - 1; i >= 0; i--) {
-        const ft = floatingTexts[i];
-        ft.y -= 2; ft.alpha -= 0.02;
-        ctx.font = 'bold 18px Arial';
-        ctx.fillStyle = 'rgba(255, 255, 255, ' + ft.alpha + ')';
-        ctx.fillText(ft.text, ft.x, ft.y);
-        if (ft.alpha <= 0) floatingTexts.splice(i, 1);
-      }
-
-      requestAnimationFrame(gameLoop);
     }
+    ctx.restore();
+  }
 
-    function gameOver(ent) {
-      gameRunning = false;
-      if (score > highscore) {
-        highscore = score;
-        localStorage.setItem('lilliHighscore', highscore);
-        highscoreEl.textContent = highscore;
-      }
-      titleEl.textContent = (ent.type === 'kid' || ent.type === 'mom')
-        ? ent.label.replace('!', '') + ' sai Lillin kiinni!'
-        : 'Hups, Lilli jäi kiinni!';
-      subtitleEl.innerHTML = 'Sait kerättyä <b>' + score + '</b> pistettä!<br>Ennätys: ' + highscore;
-      startBtn.textContent = 'UUSI KARKUMATKA';
-      overlay.style.display = 'flex';
+  for (let i = floatingTexts.length - 1; i >= 0; i--) {
+    const ft = floatingTexts[i];
+    ft.x += ft.vx * dt;
+    ft.y += ft.vy * dt;
+    ft.vy *= Math.pow(0.95, dt);
+    ft.scale = Math.max(0.9, ft.scale - 0.015 * dt);
+    ft.alpha -= 0.022 * dt;
+    if (ft.alpha <= 0) {
+      floatingTexts.splice(i, 1);
+      continue;
     }
-  </script>
+    ctx.save();
+    ctx.globalAlpha = ft.alpha;
+    ctx.translate(ft.x, ft.y);
+    ctx.scale(ft.scale, ft.scale);
+    ctx.font = 'bold 20px Arial';
+    ctx.strokeStyle = 'rgba(0,0,0,0.7)';
+    ctx.lineWidth = 3;
+    ctx.strokeText(ft.text, 0, 0);
+    ctx.fillStyle = ft.color;
+    ctx.fillText(ft.text, 0, 0);
+    ctx.restore();
+  }
+
+  requestAnimationFrame(gameLoop);
+}
+
+function gameOver(ent) {
+  gameRunning = false;
+  if (score > highscore) {
+    highscore = score;
+    localStorage.setItem('lilliHighscore', highscore);
+    highscoreEl.textContent = highscore;
+  }
+  titleEl.textContent = (ent.type === 'kid' || ent.type === 'mom')
+    ? ent.label.replace('!', '') + ' sai Lillin kiinni!'
+    : 'Hups, Lilli jäi kiinni!';
+  subtitleEl.innerHTML = 'Sait kerättyä <b>' + score + '</b> pistettä! <br>Ennätys: ' + highscore;
+  startBtn.textContent = 'UUSI KARKUMATKA';
+  overlay.style.display = 'flex';
+}
+</script>
 </body>
 </html>
-
-
