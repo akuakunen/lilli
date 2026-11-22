@@ -47,21 +47,28 @@
         resize();
 
         // Ääniefektit (pieru ja herkku)
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playFartSound() {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(110, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(45, audioCtx.currentTime + 0.35);
-            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.35);
+      let audioCtx = null;
+function playFartSound() {
+    try {
+        if (!audioCtx) {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) audioCtx = new AudioContextClass();
         }
+        if (!audioCtx) return;
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(110, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(45, audioCtx.currentTime + 0.35);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.35);
+    } catch (e) {}
+}
 
         let gameRunning = false, score = 0, speed = 6, frameCount = 0;
         let highscore = localStorage.getItem('lilliHighscore') || 0;
@@ -78,7 +85,7 @@
         const kids = ['Ella', 'Anni', 'Aino'];
 
         function resetGame() {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
             score = 0; speed = 6; frameCount = 0;
             entities = []; floatingTexts = []; fartClouds = [];
             lilli.lane = 1; lilli.isJumping = false; lilli.jumpHeight = 0;
