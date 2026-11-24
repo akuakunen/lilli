@@ -1039,7 +1039,12 @@ async function gameOver(ent) {
 
   subtitleEl.innerHTML = 'Sait kerättyä <b>' + score + '</b> pistettä!';
   startBtn.textContent = 'UUSI KARKUMATKA';
- pendingScore = score;
+  overlay.style.display = 'flex';
+
+  await fetchTopScores();
+
+  if (qualifiesForTop5(score)) {
+    pendingScore = score;
     pendingDogIcon = selectedDog === 'lilli' ? '🐩' : '🐕';
     playerNameInput.value = localStorage.getItem('lilliLastPlayerName') || '';
     newRecordBox.style.display = 'block';
