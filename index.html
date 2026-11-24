@@ -13,14 +13,12 @@
   canvas { display: block; width: 100%; height: 100%; }
   #hud { position: absolute; top: 12px; left: 15px; right: 15px; display: flex; justify-content: space-between; align-items: center; color: #fff; font-size: 18px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.6); pointer-events: none; z-index: 5; }
   #soundBtn { pointer-events: auto; background: rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.5); color: white; border-radius: 50%; width: 36px; height: 36px; font-size: 17px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
-  
   #powerHud { position: absolute; top: 52px; left: 15px; right: 15px; display: flex; flex-direction: column; gap: 6px; pointer-events: none; z-index: 5; }
   #feverBarWrap { width: 100%; height: 14px; background: rgba(0,0,0,0.45); border-radius: 10px; border: 2px solid rgba(255,255,255,0.4); overflow: hidden; position: relative; }
   #feverBarFill { width: 0%; height: 100%; background: linear-gradient(90deg, #76ff03, #ffeb3b, #ff5722); transition: width 0.15s; }
   #feverLabel { position: absolute; inset: 0; font-size: 10px; font-weight: bold; color: #fff; text-align: center; line-height: 10px; text-shadow: 1px 1px 2px #000; letter-spacing: 0.5px; }
   #activeBadges { display: flex; gap: 6px; flex-wrap: wrap; }
   .badge { background: rgba(0,0,0,0.55); border: 1px solid #ffeb3b; color: #ffeb3b; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 12px; text-shadow: 1px 1px 2px #000; }
-
   #dodgeList { position: absolute; top: 96px; left: 15px; background: rgba(0, 0, 0, 0.35); border-left: 3px solid #ff5252; border-radius: 6px; padding: 7px 9px; color: #fff; font-size: 12px; line-height: 1.45; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); pointer-events: none; z-index: 5; }
   #dodgeList .list-title { font-weight: bold; color: #ff8a80; margin-bottom: 2px; font-size: 11px; text-transform: uppercase; }
   #overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white; padding: 18px; z-index: 10; overflow-y: auto; }
@@ -32,21 +30,18 @@
   .dog-card .dog-icon { font-size: 30px; margin-bottom: 2px; }
   .dog-card .dog-name { font-weight: bold; font-size: 15px; }
   .dog-card .dog-desc { font-size: 11px; color: #ddd; }
-
   #newRecordBox { display: none; background: rgba(255, 235, 59, 0.15); border: 2px solid #ffeb3b; border-radius: 12px; padding: 10px; margin-bottom: 12px; width: 100%; max-width: 300px; }
   #newRecordBox p { font-size: 14px; color: #ffeb3b; font-weight: bold; margin-bottom: 6px; }
   .name-row { display: flex; gap: 6px; justify-content: center; }
   #playerNameInput { width: 160px; padding: 8px 10px; border-radius: 8px; border: none; font-size: 15px; font-weight: bold; user-select: text; -webkit-user-select: text; }
   #saveScoreBtn { background: #ff9800; color: #fff; border: none; border-radius: 8px; padding: 8px 14px; font-weight: bold; cursor: pointer; }
   #saveScoreBtn:disabled { opacity: 0.6; cursor: default; }
-
   #topScoresBox { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; width: 100%; max-width: 300px; }
   #topScoresBox h3 { font-size: 13px; color: #ffeb3b; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
   #topScoresList { list-style: none; font-size: 14px; text-align: left; }
   #topScoresList li { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.12); }
   #topScoresList li:last-child { border-bottom: none; }
   .score-pts { font-weight: bold; color: #76ff03; }
-
   #startBtn { background: #4CAF50; color: white; border: none; padding: 14px 30px; font-size: 19px; font-weight: bold; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
   #startBtn:active { transform: scale(0.96); }
 </style>
@@ -77,7 +72,6 @@
   <div id="overlay">
     <h1 id="title">Lillin Karkumatka</h1>
     <p id="subtitle">1000p = Kaveri rinnalle • 1500p = Magneetti & 2x • 12 herkkua = Raketti!</p>
-
     <div id="newRecordBox">
       <p>🏆 Pääsit Top 5 -listalle! Nimesi:</p>
       <div class="name-row">
@@ -85,7 +79,6 @@
         <button id="saveScoreBtn">Tallenna</button>
       </div>
     </div>
-
     <div class="dog-select">
       <div class="dog-card active" data-dog="lilli">
         <div class="dog-icon">🐩</div>
@@ -98,12 +91,10 @@
         <div class="dog-desc">Kultainen kaveri</div>
       </div>
     </div>
-
     <div id="topScoresBox">
       <h3>🌍 Yhteinen Top 5</h3>
       <ul id="topScoresList"><li>Ladataan tuloksia...</li></ul>
     </div>
-
     <button id="startBtn">ALOITA KARKUMATKA</button>
   </div>
 </div>
@@ -129,6 +120,7 @@ soundBtn.addEventListener('click', () => {
   soundEnabled = !soundEnabled;
   soundBtn.textContent = soundEnabled ? '🔊' : '🔇';
 });
+
 function playSound(type) {
   if (!soundEnabled) return;
   initAudio();
@@ -254,6 +246,7 @@ async function fetchTopScores() {
   } catch (err) {}
   renderTopScores();
 }
+
 function qualifiesForTop5(newScore) {
   if (newScore <= 0) return false;
   if (topScores.length < 5) return true;
@@ -367,6 +360,7 @@ const obstacles = [
   { type: 'obstacle', emoji: '🧸', name: 'Lelu' },
   { type: 'kid', emoji: '🧒', label: 'Lapsi!' }
 ];
+
 function showBanner(text) {
   bannerText = text;
   bannerTimer = 140;
@@ -419,7 +413,7 @@ function activateFever() {
   showBanner('🚀 PIERURAKETTI-MOODI! 🚀');
   for (let r = 0; r < 14; r++) {
     const lane = Math.floor(Math.random() * LANE_COUNT);
-    const g = Math.random() < 0.5 ? goodies : goodies;
+    const g = Math.random() < 0.5 ? goodies[4] : goodies[1];
     entities.push({
       type: 'goodie', lane: lane, y: -60 - r * 55,
       emoji: g.emoji, name: g.name, points: g.points
@@ -465,14 +459,14 @@ function jump() {
 
 let touchStartX = 0, touchStartY = 0;
 window.addEventListener('touchstart', e => {
-  touchStartX = e.touches.clientX;
-  touchStartY = e.touches.clientY;
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
 }, { passive: true });
 
 window.addEventListener('touchend', e => {
   if (!gameRunning) return;
-  const dx = e.changedTouches.clientX - touchStartX;
-  const dy = e.changedTouches.clientY - touchStartY;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
   if (Math.abs(dx) > Math.abs(dy)) {
     if (dx > 25) moveRight(); else if (dx < -25) moveLeft();
   } else if (dy < -25) {
@@ -576,6 +570,7 @@ function spawnEntity() {
   }
   return 1.0;
 }
+
 function drawDog(x, y, jumpH, time, eatPop, dogType, isRocket) {
   const popScale = Math.sin(eatPop * Math.PI) * 0.22;
   const scale = 1 + jumpH * 0.004 + popScale;
@@ -771,7 +766,7 @@ function gameLoop(timestamp) {
 
   ctx.strokeStyle = isRocket ? 'rgba(255, 235, 59, 0.55)' : 'rgba(255, 255, 255, 0.35)';
   ctx.lineWidth = 3;
-  ctx.setLineDash();
+  ctx.setLineDash([30, 30]);
   dashOffset = (dashOffset + activeSpeed * dt) % 60;
   ctx.lineDashOffset = -dashOffset;
   for (let i = 1; i < LANE_COUNT; i++) {
@@ -878,7 +873,7 @@ function gameLoop(timestamp) {
     const hitPlayer = ent.lane === player.lane;
     const hitBuddy = hasBuddy && ent.lane === buddyLane;
 
-       if ((hitPlayer || hitBuddy) && Math.abs(ent.y - player.y) < 45) {
+    if ((hitPlayer || hitBuddy) && Math.abs(ent.y - player.y) < 45) {
       if (ent.type === 'goodie' && (player.jumpHeight < 42 || isRocket)) {
         const mult = magnetActive ? 2 : 1;
         const gained = ent.points * mult;
@@ -930,6 +925,7 @@ function gameLoop(timestamp) {
 
     if (ent.y > height + 60) entities.splice(i, 1);
   }
+
   const blinkSkip = invulnTimer > 0 && Math.floor(invulnTimer / 5) % 2 === 0;
   if (!blinkSkip) {
     ctx.fillStyle = 'rgba(0,0,0,0.3)';
@@ -964,6 +960,7 @@ function gameLoop(timestamp) {
     }
     ctx.restore();
   }
+
   for (let i = floatingTexts.length - 1; i >= 0; i--) {
     const ft = floatingTexts[i];
     ft.x += ft.vx * dt; ft.y += ft.vy * dt;
@@ -1032,5 +1029,3 @@ async function gameOver(ent) {
 </script>
 </body>
 </html>
-
-
