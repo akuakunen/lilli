@@ -14,7 +14,6 @@
   #hud { position: absolute; top: 12px; left: 15px; right: 15px; display: flex; justify-content: space-between; align-items: center; color: #fff; font-size: 18px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.6); pointer-events: none; z-index: 5; }
   #soundBtn { pointer-events: auto; background: rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.5); color: white; border-radius: 50%; width: 36px; height: 36px; font-size: 17px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
   
-  /* Pieruraketti-mittari ja tilamerkit */
   #powerHud { position: absolute; top: 52px; left: 15px; right: 15px; display: flex; flex-direction: column; gap: 6px; pointer-events: none; z-index: 5; }
   #feverBarWrap { width: 100%; height: 14px; background: rgba(0,0,0,0.45); border-radius: 10px; border: 2px solid rgba(255,255,255,0.4); overflow: hidden; position: relative; }
   #feverBarFill { width: 0%; height: 100%; background: linear-gradient(90deg, #76ff03, #ffeb3b, #ff5722); transition: width 0.15s; }
@@ -116,7 +115,7 @@ const SUPABASE_KEY = 'sb_publishable_leykK4y_6wRqCorD3VprqA_pawmVWhC';
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
-// --- ÄÄNIEFEKTIT (Web Audio API) ---
+
 let audioCtx = null;
 let soundEnabled = true;
 const soundBtn = document.getElementById('soundBtn');
@@ -130,7 +129,6 @@ soundBtn.addEventListener('click', () => {
   soundEnabled = !soundEnabled;
   soundBtn.textContent = soundEnabled ? '🔊' : '🔇';
 });
-
 function playSound(type) {
   if (!soundEnabled) return;
   initAudio();
@@ -166,7 +164,7 @@ function playSound(type) {
     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
     osc.connect(gain); gain.connect(audioCtx.destination);
     osc.start(now); osc.stop(now + 0.3);
-    } else if (type === 'powerup') {
+  } else if (type === 'powerup') {
     [520, 660, 780, 1040].forEach((freq, idx) => {
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
@@ -210,7 +208,6 @@ function playSound(type) {
   }
 }
 
-// --- PILVI-TOP SCORES (SUPABASE) ---
 const topScoresList = document.getElementById('topScoresList');
 const newRecordBox = document.getElementById('newRecordBox');
 const playerNameInput = document.getElementById('playerNameInput');
@@ -228,7 +225,7 @@ function escapeHtml(text) {
 }
 
 function renderTopScores() {
-  highscoreEl.textContent = topScores.length > 0 ? topScores.score : 0;
+  highscoreEl.textContent = topScores.length > 0 ? topScores[0].score : 0;
   if (topScores.length === 0) {
     topScoresList.innerHTML = '<li style="color:#ccc; justify-content:center;">Ei vielä tuloksia!</li>';
     return;
@@ -257,7 +254,6 @@ async function fetchTopScores() {
   } catch (err) {}
   renderTopScores();
 }
-
 function qualifiesForTop5(newScore) {
   if (newScore <= 0) return false;
   if (topScores.length < 5) return true;
@@ -290,6 +286,7 @@ async function saveNewTopScore() {
   topScores.push({ name: rawName, score: pendingScore, dog: pendingDogIcon });
   topScores.sort((a, b) => b.score - a.score);
   topScores = topScores.slice(0, 5);
+  localStorage.setItem('lilliCachedTopScores', JSON.stringify(topScores));
   renderTopScores();
 
   newRecordBox.style.display = 'none';
@@ -304,7 +301,7 @@ playerNameInput.addEventListener('keydown', e => {
 });
 
 fetchTopScores();
-// --- PELIN ASETUKSET, HAHMON VALINTA & SUPERVOIMAT ---
+
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const scoreEl = document.getElementById('score');
@@ -341,7 +338,6 @@ resize();
 let gameRunning = false, score = 0, speed = 5, animTime = 0, momCooldown = 0;
 let spawnTimer = 0, fartTimer = 0, dashOffset = 0, lastTime = 0;
 
-// Supervoimien tilamuuttujat
 let buddyUnlocked = false;
 let hasBuddy = false;
 let buddyX = 0;
@@ -371,7 +367,6 @@ const obstacles = [
   { type: 'obstacle', emoji: '🧸', name: 'Lelu' },
   { type: 'kid', emoji: '🧒', label: 'Lapsi!' }
 ];
-
 function showBanner(text) {
   bannerText = text;
   bannerTimer = 140;
@@ -400,7 +395,6 @@ function getBuddyLane() {
 }
 
 function checkMilestones() {
-  // 1000 pistettä: Kaveritila aktivoituu
   if (!buddyUnlocked && score >= 1000) {
     buddyUnlocked = true;
     hasBuddy = true;
@@ -410,7 +404,6 @@ function checkMilestones() {
     showBanner(`🤝 ${buddyName} LIITTYI KARKUMATKALLE!`);
     updatePowerHud();
   }
-  // 1500 pistettä: Magneetti + Tuplapisteet
   if (!magnetActive && score >= 1500) {
     magnetActive = true;
     playSound('powerup');
@@ -421,10 +414,9 @@ function checkMilestones() {
 
 function activateFever() {
   feverCharge = 0;
-  feverTimer = 300; // n. 5 sekuntia (60 fps)
+  feverTimer = 300;
   playSound('rocket');
   showBanner('🚀 PIERURAKETTI-MOODI! 🚀');
-  // Täytetään taivas pekonilla ja pihveillä
   for (let r = 0; r < 14; r++) {
     const lane = Math.floor(Math.random() * LANE_COUNT);
     const g = Math.random() < 0.5 ? goodies : goodies;
@@ -438,6 +430,7 @@ function activateFever() {
 
 function resetGame() {
   initAudio();
+  resize();
   newRecordBox.style.display = 'none';
   score = 0; speed = 5; animTime = 0; momCooldown = 0;
   spawnTimer = 0; fartTimer = 0; dashOffset = 0;
@@ -459,6 +452,7 @@ function resetGame() {
 }
 
 startBtn.addEventListener('click', resetGame);
+
 function moveLeft() { if (gameRunning && player.lane > 0) player.lane--; }
 function moveRight() { if (gameRunning && player.lane < LANE_COUNT - 1) player.lane++; }
 function jump() { 
@@ -471,14 +465,14 @@ function jump() {
 
 let touchStartX = 0, touchStartY = 0;
 window.addEventListener('touchstart', e => {
-  touchStartX = e.touches.item(0).clientX;
-  touchStartY = e.touches.item(0).clientY;
+  touchStartX = e.touches.clientX;
+  touchStartY = e.touches.clientY;
 }, { passive: true });
 
 window.addEventListener('touchend', e => {
   if (!gameRunning) return;
-  const dx = e.changedTouches.item(0).clientX - touchStartX;
-  const dy = e.changedTouches.item(0).clientY - touchStartY;
+  const dx = e.changedTouches.clientX - touchStartX;
+  const dy = e.changedTouches.clientY - touchStartY;
   if (Math.abs(dx) > Math.abs(dy)) {
     if (dx > 25) moveRight(); else if (dx < -25) moveLeft();
   } else if (dy < -25) {
@@ -536,7 +530,6 @@ function triggerPop(x, y, points, name) {
 function spawnEntity() {
   if (momCooldown > 0) momCooldown--;
 
-  // Pieruraketin aikana sataa pelkkiä herkkuja!
   if (feverTimer > 0) {
     const lane = Math.floor(Math.random() * LANE_COUNT);
     const g = goodies[Math.floor(Math.random() * goodies.length)];
@@ -583,8 +576,6 @@ function spawnEntity() {
   }
   return 1.0;
 }
-// --- HAHMOJEN PIIRTOFUNKTIOT ---
-
 function drawDog(x, y, jumpH, time, eatPop, dogType, isRocket) {
   const popScale = Math.sin(eatPop * Math.PI) * 0.22;
   const scale = 1 + jumpH * 0.004 + popScale;
@@ -595,7 +586,6 @@ function drawDog(x, y, jumpH, time, eatPop, dogType, isRocket) {
   ctx.translate(x, drawY + bounce);
   ctx.scale(scale, scale);
 
-  // Pieruraketin turbopilvi koiran alla
   if (isRocket) {
     ctx.fillStyle = 'rgba(118, 255, 3, 0.85)';
     ctx.beginPath();
@@ -731,7 +721,7 @@ function drawBigMom(centerX, y, totalWidth, time) {
 
   ctx.restore();
 }
-// --- PÄÄSILMUKKA ---
+
 function gameLoop(timestamp) {
   if (!gameRunning) return;
 
@@ -746,7 +736,6 @@ function gameLoop(timestamp) {
   if (bannerTimer > 0) bannerTimer = Math.max(0, bannerTimer - dt);
   if (player.eatPop > 0) player.eatPop = Math.max(0, player.eatPop - 0.08 * dt);
 
-  // Pieruraketti-ajastin ja savuvana
   const isRocket = feverTimer > 0;
   const activeSpeed = isRocket ? speed * 1.65 : speed;
 
@@ -766,7 +755,7 @@ function gameLoop(timestamp) {
     if (feverTimer <= 0) {
       player.jumpHeight = 0;
       player.isJumping = false;
-      invulnTimer = 60; // 1 sekunnin turva laskeutuessa
+      invulnTimer = 60;
     }
     updatePowerHud();
   }
@@ -777,13 +766,11 @@ function gameLoop(timestamp) {
     if (Math.random() < 0.75) triggerFart();
   }
 
-  // Tausta (kultahehku Pieruraketissa)
   ctx.fillStyle = isRocket ? '#689f38' : '#558b2f';
   ctx.fillRect(0, 0, width, height);
 
   ctx.strokeStyle = isRocket ? 'rgba(255, 235, 59, 0.55)' : 'rgba(255, 255, 255, 0.35)';
-   ctx.lineWidth = 3;
-  ctx.setLineDash([30, 30]);
+  ctx.lineWidth = 3;
   ctx.setLineDash();
   dashOffset = (dashOffset + activeSpeed * dt) % 60;
   ctx.lineDashOffset = -dashOffset;
@@ -802,7 +789,6 @@ function gameLoop(timestamp) {
     spawnTimer = baseInterval * delayMultiplier;
   }
 
-  // Pelaajan ja Kaverin sijainnit
   const targetX = player.lane * laneWidth + laneWidth / 2;
   player.x += (targetX - player.x) * (1 - Math.pow(0.75, dt));
   player.y = height - 110;
@@ -822,7 +808,6 @@ function gameLoop(timestamp) {
     }
   }
 
-  // Pierupilvet
   for (let i = fartClouds.length - 1; i >= 0; i--) {
     const fc = fartClouds[i];
     fc.x += fc.vx * dt;
@@ -834,7 +819,6 @@ function gameLoop(timestamp) {
     ctx.beginPath(); ctx.arc(fc.x, fc.y, fc.size, 0, Math.PI * 2); ctx.fill();
   }
 
-  // Entiteetit
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   for (let i = entities.length - 1; i >= 0; i--) {
@@ -864,7 +848,6 @@ function gameLoop(timestamp) {
       continue;
     }
 
-    // Magneetti vetää viereisten kaistojen herkkuja kohti pelaajaa
     let drawX = ent.lane * laneWidth + laneWidth / 2;
     if (ent.type === 'goodie' && (magnetActive || isRocket) && Math.abs(ent.y - player.y) < 170) {
       drawX += (player.x - drawX) * 0.25;
@@ -892,11 +875,10 @@ function gameLoop(timestamp) {
       ctx.fillText(ent.label, drawX, ent.y - 32);
     }
 
-    // Osumatarkistus (Pelaaja TAI Kaveri)
     const hitPlayer = ent.lane === player.lane;
     const hitBuddy = hasBuddy && ent.lane === buddyLane;
 
-    if ((hitPlayer || hitBuddy) && Math.abs(ent.y - player.y) < 45) {
+       if ((hitPlayer || hitBuddy) && Math.abs(ent.y - player.y) < 45) {
       if (ent.type === 'goodie' && (player.jumpHeight < 42 || isRocket)) {
         const mult = magnetActive ? 2 : 1;
         const gained = ent.points * mult;
@@ -924,7 +906,6 @@ function gameLoop(timestamp) {
         continue;
       } else if (ent.type === 'obstacle' || ent.type === 'kid') {
         if (isRocket) {
-          // Pieruraketti jyrää esteet ilmaan!
           triggerPop(drawX, ent.y, 50, 'JYRÄTTY');
           score += 50;
           scoreEl.textContent = score;
@@ -949,8 +930,6 @@ function gameLoop(timestamp) {
 
     if (ent.y > height + 60) entities.splice(i, 1);
   }
-
-  // Varjot ja koirat (välkkyy suojauksen aikana)
   const blinkSkip = invulnTimer > 0 && Math.floor(invulnTimer / 5) % 2 === 0;
   if (!blinkSkip) {
     ctx.fillStyle = 'rgba(0,0,0,0.3)';
@@ -969,7 +948,6 @@ function gameLoop(timestamp) {
     }
   }
 
-  // Partikkelit & kelluvat tekstit
   for (let i = popParticles.length - 1; i >= 0; i--) {
     const p = popParticles[i];
     p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 0.15 * dt; p.alpha -= 0.03 * dt;
@@ -986,7 +964,6 @@ function gameLoop(timestamp) {
     }
     ctx.restore();
   }
-
   for (let i = floatingTexts.length - 1; i >= 0; i--) {
     const ft = floatingTexts[i];
     ft.x += ft.vx * dt; ft.y += ft.vy * dt;
@@ -1007,7 +984,6 @@ function gameLoop(timestamp) {
     ctx.restore();
   }
 
-  // Ilmoitusbanneri ruudun keskellä
   if (bannerTimer > 0) {
     ctx.save();
     ctx.globalAlpha = Math.min(1, bannerTimer / 25);
@@ -1056,3 +1032,5 @@ async function gameOver(ent) {
 </script>
 </body>
 </html>
+
+
