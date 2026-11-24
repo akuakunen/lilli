@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lilli-v11';
+const CACHE_NAME = 'lilli-v12';
 const ASSETS = ['./', 'index.html', 'manifest.json'];
 
 self.addEventListener('install', e => {
