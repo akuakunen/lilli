@@ -13,6 +13,7 @@
   canvas { display: block; width: 100%; height: 100%; }
   #hud { position: absolute; top: 12px; left: 15px; right: 15px; display: flex; justify-content: space-between; align-items: center; color: #fff; font-size: 18px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.6); pointer-events: none; z-index: 5; }
   #soundBtn { pointer-events: auto; background: rgba(0,0,0,0.4); border: 2px solid rgba(255,255,255,0.5); color: white; border-radius: 50%; width: 36px; height: 36px; font-size: 17px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+  
   #powerHud { position: absolute; top: 52px; left: 15px; right: 15px; display: flex; flex-direction: column; gap: 6px; pointer-events: none; z-index: 5; }
   #feverBarWrap { width: 100%; height: 14px; background: rgba(0,0,0,0.45); border-radius: 10px; border: 2px solid rgba(255,255,255,0.4); overflow: hidden; position: relative; }
   #feverBarFill { width: 0%; height: 100%; background: linear-gradient(90deg, #76ff03, #ffeb3b, #ff5722); transition: width 0.15s; }
@@ -21,32 +22,36 @@
   .badge { background: rgba(0,0,0,0.55); border: 1px solid #ffeb3b; color: #ffeb3b; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 12px; text-shadow: 1px 1px 2px #000; }
   #dodgeList { position: absolute; top: 96px; left: 15px; background: rgba(0, 0, 0, 0.35); border-left: 3px solid #ff5252; border-radius: 6px; padding: 7px 9px; color: #fff; font-size: 12px; line-height: 1.45; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); pointer-events: none; z-index: 5; }
   #dodgeList .list-title { font-weight: bold; color: #ff8a80; margin-bottom: 2px; font-size: 11px; text-transform: uppercase; }
-  #overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white; padding: 18px; z-index: 10; overflow-y: auto; }
-  #title { font-size: 27px; margin-bottom: 6px; color: #ffeb3b; }
-  #subtitle { font-size: 14px; margin-bottom: 12px; line-height: 1.4; }
-  .dog-select { display: flex; gap: 12px; margin-bottom: 14px; }
-  .dog-card { background: rgba(255,255,255,0.12); border: 3px solid transparent; border-radius: 14px; padding: 9px 15px; cursor: pointer; transition: 0.2s; min-width: 115px; }
+  #overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white; padding: 14px; z-index: 10; overflow-y: auto; }
+  #title { font-size: 25px; margin-bottom: 4px; color: #ffeb3b; }
+  #subtitle { font-size: 13px; margin-bottom: 10px; line-height: 1.35; }
+  .dog-select { display: flex; gap: 10px; margin-bottom: 10px; }
+  .dog-card { background: rgba(255,255,255,0.12); border: 3px solid transparent; border-radius: 14px; padding: 7px 14px; cursor: pointer; transition: 0.2s; min-width: 110px; }
   .dog-card.active { border-color: #ffeb3b; background: rgba(255,235,59,0.2); transform: scale(1.04); }
-  .dog-card .dog-icon { font-size: 30px; margin-bottom: 2px; }
-  .dog-card .dog-name { font-weight: bold; font-size: 15px; }
+  .dog-card .dog-icon { font-size: 26px; margin-bottom: 2px; }
+  .dog-card .dog-name { font-weight: bold; font-size: 14px; }
   .dog-card .dog-desc { font-size: 11px; color: #ddd; }
-  #newRecordBox { display: none; background: rgba(255, 235, 59, 0.15); border: 2px solid #ffeb3b; border-radius: 12px; padding: 10px; margin-bottom: 12px; width: 100%; max-width: 300px; }
-  #newRecordBox p { font-size: 14px; color: #ffeb3b; font-weight: bold; margin-bottom: 6px; }
+
+  #newRecordBox { display: none; background: rgba(255, 235, 59, 0.15); border: 2px solid #ffeb3b; border-radius: 12px; padding: 8px 10px; margin-bottom: 10px; width: 100%; max-width: 310px; }
+  #newRecordBox p { font-size: 13px; color: #ffeb3b; font-weight: bold; margin-bottom: 6px; }
   .name-row { display: flex; gap: 6px; justify-content: center; }
-  #playerNameInput { width: 160px; padding: 8px 10px; border-radius: 8px; border: none; font-size: 15px; font-weight: bold; user-select: text; -webkit-user-select: text; }
-  #saveScoreBtn { background: #ff9800; color: #fff; border: none; border-radius: 8px; padding: 8px 14px; font-weight: bold; cursor: pointer; }
+  #playerNameInput { width: 165px; padding: 7px 10px; border-radius: 8px; border: none; font-size: 14px; font-weight: bold; user-select: text; -webkit-user-select: text; }
+  #saveScoreBtn { background: #ff9800; color: #fff; border: none; border-radius: 8px; padding: 7px 14px; font-weight: bold; cursor: pointer; }
   #saveScoreBtn:disabled { opacity: 0.6; cursor: default; }
-  #topScoresBox { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; width: 100%; max-width: 300px; }
+
+  #topScoresBox { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 8px 12px; margin-bottom: 12px; width: 100%; max-width: 310px; }
   #topScoresBox h3 { font-size: 13px; color: #ffeb3b; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
-  #topScoresList { list-style: none; font-size: 14px; text-align: left; }
+  #topScoresList { list-style: none; font-size: 13px; text-align: left; max-height: 195px; overflow-y: auto; padding-right: 4px; }
   #topScoresList li { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.12); }
   #topScoresList li:last-child { border-bottom: none; }
   .score-pts { font-weight: bold; color: #76ff03; }
-  #startBtn { background: #4CAF50; color: white; border: none; padding: 14px 30px; font-size: 19px; font-weight: bold; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
+  #dbStatus { font-size: 11px; color: #ff8a80; margin-top: 4px; display: none; }
+
+  #startBtn { background: #4CAF50; color: white; border: none; padding: 12px 28px; font-size: 18px; font-weight: bold; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
   #startBtn:active { transform: scale(0.96); }
 </style>
 </head>
-<body>
+ <body>
 <div id="gameContainer">
   <div id="hud">
     <div>Pisteet: <span id="score">0</span></div>
@@ -72,13 +77,15 @@
   <div id="overlay">
     <h1 id="title">Lillin Karkumatka</h1>
     <p id="subtitle">1000p = Kaveri rinnalle • 1500p = Magneetti & 2x • 12 herkkua = Raketti!</p>
+
     <div id="newRecordBox">
-      <p>🏆 Pääsit Top 5 -listalle! Nimesi:</p>
+      <p>🏆 Pääsit Top 10 -listalle! Nimesi:</p>
       <div class="name-row">
         <input type="text" id="playerNameInput" maxlength="14" placeholder="Nimesi...">
         <button id="saveScoreBtn">Tallenna</button>
       </div>
     </div>
+
     <div class="dog-select">
       <div class="dog-card active" data-dog="lilli">
         <div class="dog-icon">🐩</div>
@@ -91,21 +98,27 @@
         <div class="dog-desc">Kultainen kaveri</div>
       </div>
     </div>
+
     <div id="topScoresBox">
-      <h3>🌍 Yhteinen Top 5</h3>
+      <h3>🌍 Yhteinen Top 10</h3>
       <ul id="topScoresList"><li>Ladataan tuloksia...</li></ul>
+      <div id="dbStatus"></div>
     </div>
+
     <button id="startBtn">ALOITA KARKUMATKA</button>
   </div>
 </div>
-
 <script>
+// 1. LAITA TÄHÄN OMA SUPABASE-OSOITE (ilman kenoviivaa lopussa):
+const SUPABASE_URL = 'https://jzpdfosjfzbganydjifk.supabase.co/';
 
-const SUPABASE_URL = 'https://supabase.co/';
+// 2. LAITA TÄHÄN PITKÄ eyJ-ALKUINEN AVAIN:
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6cGRmb3NqZnpiZ2FueWRqaWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1Mjk1MzAsImV4cCI6MjExMTEwNTUzMH0.YueE8_KbAAH16spto9xiw9uBJVWmWsjx5isF5f2l1mI';
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    for (let reg of regs) reg.unregister();
+  });
 }
 
 let audioCtx = null;
@@ -200,14 +213,14 @@ function playSound(type) {
     osc.start(now); osc.stop(now + 0.48);
   }
 }
-
 const topScoresList = document.getElementById('topScoresList');
 const newRecordBox = document.getElementById('newRecordBox');
 const playerNameInput = document.getElementById('playerNameInput');
 const saveScoreBtn = document.getElementById('saveScoreBtn');
 const highscoreEl = document.getElementById('highscore');
+const dbStatusEl = document.getElementById('dbStatus');
 
-let topScores = JSON.parse(localStorage.getItem('lilliCachedTopScores')) || [];
+let topScores = [];
 let pendingScore = 0;
 let pendingDogIcon = '🐩';
 
@@ -223,34 +236,49 @@ function renderTopScores() {
     topScoresList.innerHTML = '<li style="color:#ccc; justify-content:center;">Ei vielä tuloksia!</li>';
     return;
   }
-  const medals = ['🥇', '🥈', '🥉', '4.', '5.'];
+  const medals = ['🥇', '🥈', '🥉', '4.', '5.', '6.', '7.', '8.', '9.', '10.'];
   topScoresList.innerHTML = topScores.map((item, i) => `
     <li>
-      <span>${medals[i]} ${escapeHtml(item.dog || '🐩')} ${escapeHtml(item.name)}</span>
+      <span>${medals[i] || (i + 1) + '.'} ${escapeHtml(item.dog || '🐩')} ${escapeHtml(item.name)}</span>
       <span class="score-pts">${item.score} p</span>
     </li>
   `).join('');
 }
 
 async function fetchTopScores() {
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+    dbStatusEl.style.display = 'block';
+    dbStatusEl.textContent = '⚠️ Lisää SUPABASE_URL ja SUPABASE_KEY koodiin!';
+    renderTopScores();
+    return;
+  }
+
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/scores?select=name,score,dog&order=score.desc&limit=5`, {
+    const cleanUrl = SUPABASE_URL.trim().replace(/\/+$/, '');
+    const cleanKey = SUPABASE_KEY.trim();
+    const res = await fetch(`${cleanUrl}/rest/v1/scores?select=name,score,dog&order=score.desc&limit=10`, {
       headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`
+        'apikey': cleanKey,
+        'Authorization': `Bearer ${cleanKey}`
       }
     });
     if (res.ok) {
       topScores = await res.json();
-      localStorage.setItem('lilliCachedTopScores', JSON.stringify(topScores));
+      dbStatusEl.style.display = 'none';
+    } else {
+      dbStatusEl.style.display = 'block';
+      dbStatusEl.textContent = `Virhe haussa (${res.status}) - tarkista avain ja taulu`;
     }
-  } catch (err) {}
+  } catch (err) {
+    dbStatusEl.style.display = 'block';
+    dbStatusEl.textContent = 'Yhteysvirhe tietokantaan';
+  }
   renderTopScores();
 }
 
-function qualifiesForTop5(newScore) {
+function qualifiesForTop10(newScore) {
   if (newScore <= 0) return false;
-  if (topScores.length < 5) return true;
+  if (topScores.length < 10) return true;
   return newScore > topScores[topScores.length - 1].score;
 }
 
@@ -261,11 +289,13 @@ async function saveNewTopScore() {
   saveScoreBtn.textContent = '...';
 
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/scores`, {
+    const cleanUrl = SUPABASE_URL.trim().replace(/\/+$/, '');
+    const cleanKey = SUPABASE_KEY.trim();
+    const res = await fetch(`${cleanUrl}/rest/v1/scores`, {
       method: 'POST',
       headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'apikey': cleanKey,
+        'Authorization': `Bearer ${cleanKey}`,
         'Content-Type': 'application/json',
         'Prefer': 'return=minimal'
       },
@@ -275,13 +305,11 @@ async function saveNewTopScore() {
         dog: pendingDogIcon
       })
     });
+    if (!res.ok) {
+      dbStatusEl.style.display = 'block';
+      dbStatusEl.textContent = `Tallennus epäonnistui (${res.status})`;
+    }
   } catch (err) {}
-
-  topScores.push({ name: rawName, score: pendingScore, dog: pendingDogIcon });
-  topScores.sort((a, b) => b.score - a.score);
-  topScores = topScores.slice(0, 5);
-  localStorage.setItem('lilliCachedTopScores', JSON.stringify(topScores));
-  renderTopScores();
 
   newRecordBox.style.display = 'none';
   saveScoreBtn.disabled = false;
@@ -295,7 +323,6 @@ playerNameInput.addEventListener('keydown', e => {
 });
 
 fetchTopScores();
-
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const scoreEl = document.getElementById('score');
@@ -388,7 +415,6 @@ function getBuddyLane() {
   if (!hasBuddy) return -1;
   return player.lane < LANE_COUNT - 1 ? player.lane + 1 : player.lane - 1;
 }
-
 function checkMilestones() {
   if (!buddyUnlocked && score >= 1000) {
     buddyUnlocked = true;
@@ -414,7 +440,7 @@ function activateFever() {
   showBanner('🚀 PIERURAKETTI-MOODI! 🚀');
   for (let r = 0; r < 14; r++) {
     const lane = Math.floor(Math.random() * LANE_COUNT);
-    const g = Math.random() < 0.5 ? goodies[4] : goodies[1];
+    const g = Math.random() < 0.5 ? goodies[1] : goodies[4];
     entities.push({
       type: 'goodie', lane: lane, y: -60 - r * 55,
       emoji: g.emoji, name: g.name, points: g.points
@@ -425,7 +451,6 @@ function activateFever() {
 
 function resetGame() {
   initAudio();
-  resize();
   newRecordBox.style.display = 'none';
   score = 0; speed = 5; animTime = 0; momCooldown = 0;
   spawnTimer = 0; fartTimer = 0; dashOffset = 0;
@@ -447,7 +472,6 @@ function resetGame() {
 }
 
 startBtn.addEventListener('click', resetGame);
-
 function moveLeft() { if (gameRunning && player.lane > 0) player.lane--; }
 function moveRight() { if (gameRunning && player.lane < LANE_COUNT - 1) player.lane++; }
 function jump() { 
@@ -460,14 +484,14 @@ function jump() {
 
 let touchStartX = 0, touchStartY = 0;
 window.addEventListener('touchstart', e => {
-  touchStartX = e.touches[0].clientX;
-  touchStartY = e.touches[0].clientY;
+  touchStartX = e.touches.item(0).clientX;
+  touchStartY = e.touches.item(0).clientY;
 }, { passive: true });
 
 window.addEventListener('touchend', e => {
   if (!gameRunning) return;
-  const dx = e.changedTouches[0].clientX - touchStartX;
-  const dy = e.changedTouches[0].clientY - touchStartY;
+  const dx = e.changedTouches.item(0).clientX - touchStartX;
+  const dy = e.changedTouches.item(0).clientY - touchStartY;
   if (Math.abs(dx) > Math.abs(dy)) {
     if (dx > 25) moveRight(); else if (dx < -25) moveLeft();
   } else if (dy < -25) {
@@ -571,7 +595,6 @@ function spawnEntity() {
   }
   return 1.0;
 }
-
 function drawDog(x, y, jumpH, time, eatPop, dogType, isRocket) {
   const popScale = Math.sin(eatPop * Math.PI) * 0.22;
   const scale = 1 + jumpH * 0.004 + popScale;
@@ -717,7 +740,6 @@ function drawBigMom(centerX, y, totalWidth, time) {
 
   ctx.restore();
 }
-
 function gameLoop(timestamp) {
   if (!gameRunning) return;
 
@@ -843,7 +865,6 @@ function gameLoop(timestamp) {
       if (ent.y > height + 90) entities.splice(i, 1);
       continue;
     }
-
     let drawX = ent.lane * laneWidth + laneWidth / 2;
     if (ent.type === 'goodie' && (magnetActive || isRocket) && Math.abs(ent.y - player.y) < 170) {
       drawX += (player.x - drawX) * 0.25;
@@ -1018,7 +1039,7 @@ async function gameOver(ent) {
 
   await fetchTopScores();
 
-  if (qualifiesForTop5(score)) {
+  if (qualifiesForTop10(score)) {
     pendingScore = score;
     pendingDogIcon = selectedDog === 'lilli' ? '🐩' : '🐕';
     playerNameInput.value = localStorage.getItem('lilliLastPlayerName') || '';
@@ -1030,3 +1051,4 @@ async function gameOver(ent) {
 </script>
 </body>
 </html>
+
