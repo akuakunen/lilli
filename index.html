@@ -166,8 +166,8 @@ function playSound(type) {
     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
     osc.connect(gain); gain.connect(audioCtx.destination);
     osc.start(now); osc.stop(now + 0.3);
-  } else if (type === 'powerup') {
-    [440, 554, 659, 880].forEach((freq, idx) => {
+    } else if (type === 'powerup') {
+    [520, 660, 780, 1040].forEach((freq, idx) => {
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = 'triangle';
@@ -782,7 +782,8 @@ function gameLoop(timestamp) {
   ctx.fillRect(0, 0, width, height);
 
   ctx.strokeStyle = isRocket ? 'rgba(255, 235, 59, 0.55)' : 'rgba(255, 255, 255, 0.35)';
-  ctx.lineWidth = 3;
+   ctx.lineWidth = 3;
+  ctx.setLineDash([30, 30]);
   ctx.setLineDash();
   dashOffset = (dashOffset + activeSpeed * dt) % 60;
   ctx.lineDashOffset = -dashOffset;
